@@ -8,20 +8,25 @@ import {Mode,Properties} from "../../lib/mode/mode";
   selector: 'digi-modes',
   template:`
     <ion-slides class='digi-modes' #modeSlider [options]='mySlideOptions' [didChange]='onModeChanged()'>
-      <ion-slide *ngFor='#mode of modes'>
+      <ion-slide *ngFor='let mode of modes'>
       <form>
         <h1>{{mode.properties.name}}</h1>
         <h3>{{mode.properties.description}}</h3>
         <ion-list>
-          <ion-item *ngFor='#ctrl of mode.properties.controls'>
-            <label>{{ctrl.name}}</label>
+          <div *ngFor='let ctrl of mode.properties.controls'>
             <div [ngSwitch]='ctrl.type'>
-              <input type='checkbox' *ngSwitchWhen="'boolean'" [(ngModel)]='ctrl.value' class='form-control'/>
-              <select *ngSwitchWhen="'choice'" [(ngModel)]='ctrl.value' class='form-control'>
-                <option *ngFor='#opt of ctrl.options' [value]='opt.value' >{{opt.name}}</option>
-              </select>
+            <ion-item *ngSwitchWhen="'boolean'">
+              <ion-label>{{ctrl.name}}</ion-label>
+              <ion-toggle [(ngModel)]='ctrl.value' class='form-control'></ion-toggle>
+            </ion-item>
+            <ion-item *ngSwitchWhen="'choice'">
+              <ion-label>{{ctrl.name}}</ion-label>
+              <ion-select [(ngModel)]='ctrl.value' class='form-control'>
+                <ion-option *ngFor='let opt of ctrl.options' [value]='opt.value' >{{opt.name}}</ion-option>
+              </ion-select>
+            </ion-item>
             </div>
-          </ion-item>
+          </div>
         </ion-list>
         </form>
       </ion-slide>

@@ -1,5 +1,6 @@
-import {Component, ViewChild, AfterViewInit} from '@angular/core';
+import {Component, ViewChild, Input, AfterViewInit} from '@angular/core';
 import {CORE_DIRECTIVES} from '@angular/common';
+import {IONIC_DIRECTIVES} from 'ionic-angular';
 import {DigiService} from '../../services/DigiService';
 import {Digi,InText} from "../../lib/digi";
 import {Tuner,TunerImpl} from "../../lib/tuner";
@@ -8,8 +9,22 @@ import {Tuner,TunerImpl} from "../../lib/tuner";
   selector: 'digi-panel',
   template:`
     <div class='list'>
-      <button type='button' class='digi-rxtx item' [ngClass]='{txActive: isOn(), disabled: isDisabled}'
-         (click)='toggleRxTx()'>Rx / Tx</button>
+
+      <ion-row id="buttonbar">
+        <ion-col width-15>
+          <ion-item [ngClass]='{txActive: rxTx, txInactive: !rxTx}'>
+            <ion-label>Rx / Tx</ion-label>
+            <ion-toggle  [(ngModel)]='rxTx' disabled='false'></ion-toggle>
+          </ion-item>
+        </ion-col>
+        <ion-col width-15>
+          <ion-item>
+            <ion-label>QRZ lookup</ion-label>
+            <ion-toggle [(ngModel)]='useQRZ'></ion-toggle>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+
       <canvas #tuner class='digi-tuner item' width='800px' height='175px'></canvas>
       <textarea #status class='digi-status item'></textarea>
       <textarea #output class='digi-output item'></textarea>
@@ -44,12 +59,16 @@ import {Tuner,TunerImpl} from "../../lib/tuner";
         text-align: center;
       }
       .txActive{
-        background-color : #bb8888;
+        background-color : #cc0000;
+      }
+      .txInactive{
+        background-color : #00cc00;
       }
     `],
-    directives: [CORE_DIRECTIVES]
+    directives: [CORE_DIRECTIVES, IONIC_DIRECTIVES]
 })
 export class DigiPanel implements AfterViewInit {
+
 
   @ViewChild("tuner") tunerAnchor;
   @ViewChild("status") statusAnchor;
@@ -121,14 +140,25 @@ export class DigiPanel implements AfterViewInit {
     this.digi.inText = textWidget;
   }
 
-  isOn() {
+  get rxTx() {
     return this.digi.txMode;
   }
 
-  toggleRxTx() {
-    let rxtx = !this.digi.txMode;
-    this.digi.txMode = rxtx;
+  @Input()
+  set rxTx(val) {
+    this.digi.txMode = val;
   }
+
+  get useQRZ() {
+    return this.digi.useQrz;
+  }
+
+  @Input()
+  set useQRZ(val) {
+    this.digi.useQrz = val;
+  }
+
+
 
 
 }
