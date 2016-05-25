@@ -112,7 +112,7 @@ export class TunerImpl implements Tuner {
         this._lastRow = null;
         this._scopeData = [];
 
-        this.resize();
+        this.setupBitmap();
 
         canvas.setAttribute('tabindex', '1');
 
@@ -141,14 +141,8 @@ export class TunerImpl implements Tuner {
     }
 
 
-    resize(): void {
+    setupBitmap(): void {
         let canvas = this._canvas;
-        let cw = canvas.clientWidth;
-        let ch = canvas.clientHeight;
-        if (cw > 0 && ch > 0) {
-          canvas.width = cw;
-          canvas.height = ch;
-        }
         this._width = canvas.width;
         this._height = canvas.height;
         // this._par.status('resize w:' + this._width + '  h:' + this._height);
@@ -178,20 +172,6 @@ export class TunerImpl implements Tuner {
         // hate to use 'self' here, but it's a safe way
         let self = this;
 
-        let _checkResize = true;
-        function checkResize() {
-            if (_checkResize) {
-                self.resize();
-                _checkResize = false;
-                setTimeout(function() {
-                    _checkResize = true;
-                    self.resize();
-                }, 500);
-            }
-        }
-
-        window.addEventListener('resize', checkResize);
-
         function mouseFreq(event) {
             let pt = getMousePos(canvas, event);
             let freq = self._MAX_FREQ * pt.x / self._width;
@@ -200,7 +180,9 @@ export class TunerImpl implements Tuner {
 
         function getMousePos(cnv, evt) {
             let rect = cnv.getBoundingClientRect();
-            return { x: evt.clientX - rect.left, y: evt.clientY - rect.top };
+            let x = (evt.clientX - rect.left) * cnv.width / rect.width;
+            let y = (evt.clientY - rect.top) * cnv.height / rect.height;
+            return { x: x, y: y };
         }
 
         canvas.onclick = (event) => {
