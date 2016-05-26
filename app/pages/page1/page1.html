@@ -1,17 +1,38 @@
 
 <ion-navbar *navbar>
-  <button menuToggle>
+
+  <button menuToggle='left' position='left'>
     <ion-icon name="menu"></ion-icon>
   </button>
+
   <ion-title>xdigi</ion-title>
+
+  <ion-buttons end>
+  <button menuToggle='right' position='right'>
+    <ion-icon name="menu"></ion-icon>
+  </button>
+</ion-buttons>
+
 </ion-navbar>
 
-<ion-menu [content]="content">
-  <button menuToggle>
+
+
+
+<ion-menu [content]="content" side='left'>
+  <button menuClose='left'>
     Modes <ion-icon name="menu"></ion-icon>
   </button>
 
   <digi-modes></digi-modes>
+
+</ion-menu>
+
+<ion-menu [content]="content" side='right'>
+  <button menuClose='right'>
+    Config <ion-icon name="menu"></ion-icon>
+  </button>
+
+  <button (click)='doExit()'>Exit</button>
 
 </ion-menu>
 

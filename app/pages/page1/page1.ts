@@ -7,7 +7,13 @@ import {DigiModes} from "../../components/digi/DigiModes";
 	directives: [DigiPanel, DigiModes]
 })
 export class Page1 {
-  constructor() {
 
+
+
+  constructor() {
   }
+
+	doExit() {
+		//navigator.device.exitApp();
+	}
 }
