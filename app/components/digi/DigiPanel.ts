@@ -25,7 +25,7 @@ import {Tuner,TunerImpl} from "../../lib/tuner";
         </ion-col>
       </ion-row>
 
-      <canvas #tuner class='digi-tuner item' width='800px' height='175px'></canvas>
+      <canvas #tuner class='digi-tuner item' width='800' height='180'></canvas>
       <textarea #status class='digi-status item'></textarea>
       <textarea #output class='digi-output item'></textarea>
       <textarea #input class='digi-input item'></textarea>
@@ -33,6 +33,7 @@ import {Tuner,TunerImpl} from "../../lib/tuner";
     `,
     styles: [`
       .digi-tuner {
+        height: 180px,
         margin: 0;
         padding: 0;
       }
