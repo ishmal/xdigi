@@ -180,6 +180,11 @@ export class Digi {
         this._mode.frequency = freq;
     }
 
+    //setting the frequency from UI
+    setFrequency(freq: number) {
+      this.tuner.frequency = freq;
+    }
+
     get frequency(): number {
         return this._mode.frequency;
     }

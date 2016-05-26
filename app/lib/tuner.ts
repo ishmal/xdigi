@@ -177,14 +177,8 @@ export class TunerImpl implements Tuner {
         function mouseFreq(event) {
             let pt = getMousePos(canvas, event);
             let x = pt.x;
-            if (x < 20 && self.frequency > FINE_INCR) {
-              self.frequency -= FINE_INCR;
-            } else if (x > canvas.width - 20 && self.frequency < self._MAX_FREQ - FINE_INCR) {
-              self.frequency += FINE_INCR;
-            } else {
-              let freq = self._MAX_FREQ * pt.x / self._width;
-              self.frequency = freq;
-            }
+            let freq = self._MAX_FREQ * pt.x / self._width;
+            self.frequency = freq;
         }
 
         function getMousePos(cnv, evt) {

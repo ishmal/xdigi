@@ -1,6 +1,6 @@
 import {Component, ViewChild, Input, AfterViewInit} from '@angular/core';
 import {CORE_DIRECTIVES} from '@angular/common';
-import {IONIC_DIRECTIVES} from 'ionic-angular';
+import {IONIC_DIRECTIVES, NavController, Toast} from 'ionic-angular';
 import {DigiService} from '../../services/DigiService';
 import {Digi,Terminal} from "../../lib/digi";
 import {Tuner,TunerImpl} from "../../lib/tuner";
@@ -32,7 +32,23 @@ import {Tuner,TunerImpl} from "../../lib/tuner";
       </ion-row>
 
       <canvas #tuner class='digi-tuner item' width='800' height='124'></canvas>
-      <textarea #status class='digi-status item'></textarea>
+
+      <ion-row id='vcrbar'>
+        <ion-col width-25>
+          <button (click)="fastDown()"><ion-icon name="rewind"></ion-icon></button>
+        </ion-col>
+        <ion-col width-25>
+          <button (click)="slowDown()"><ion-icon name="skip-backward"></ion-icon></button>
+        </ion-col>
+        <ion-col width-25>
+          <button (click)="fastUp()"><ion-icon name="skip-forward"></ion-icon></button>
+        </ion-col>
+        <ion-col width-25>
+          <button (click)="slowUp()"><ion-icon name="fastforward"></ion-icon></button>
+        </ion-col>
+
+      </ion-row>
+
       <textarea #terminal class='digi-terminal item'></textarea>
     </div>
     `,
@@ -75,10 +91,12 @@ export class DigiPanel implements AfterViewInit {
   @ViewChild("terminal") terminalAnchor;
 
   digi: Digi;
+  nav: NavController;
 
-  constructor(digiService: DigiService) {
+  constructor(digiService: DigiService, nav: NavController) {
     console.log("digipanel");
     this.digi = digiService.getDigi();
+    this.nav = nav;
   }
 
   ngAfterViewInit() {
@@ -96,15 +114,17 @@ export class DigiPanel implements AfterViewInit {
   }
 
   setupStatus() {
-    let txt = this.statusAnchor.nativeElement;
     let textWidget = {
         clear : () => {
-          txt.value = "";
+          //no action
         },
         putText : (str: string) => {
-          let s = txt.value
-          txt.value = s + str;
-          txt.scrollTop = txt.scrollHeight;
+          let opts = {
+            message: str,
+            duration: 3000
+          };
+          let toast = new Toast(opts);
+          this.nav.present(toast);
         }
     };
     this.digi.statText = textWidget;
@@ -153,6 +173,22 @@ export class DigiPanel implements AfterViewInit {
   @Input()
   set useQRZ(val) {
     this.digi.useQrz = val;
+  }
+
+  fastDown() {
+    this.digi.setFrequency(this.digi.frequency - 5);
+  }
+
+  slowDown() {
+    this.digi.setFrequency(this.digi.frequency - 1);
+  }
+
+  slowUp() {
+    this.digi.setFrequency(this.digi.frequency + 1);
+  }
+
+  fastUp() {
+    this.digi.setFrequency(this.digi.frequency + 5);
   }
 
 
