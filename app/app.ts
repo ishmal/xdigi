@@ -1,6 +1,6 @@
 import {App, Platform} from 'ionic-angular';
 import {StatusBar} from 'ionic-native';
-import {TabsPage} from './pages/tabs/tabs';
+import {Page1} from './pages/page1/page1';
 import {DigiService} from './services/DigiService';
 
 
@@ -10,7 +10,8 @@ import {DigiService} from './services/DigiService';
   config: {} // http://ionicframework.com/docs/v2/api/config/Config/
 })
 export class MyApp {
-  rootPage: any = TabsPage;
+
+  rootPage: any = Page1;
 
   constructor(platform: Platform) {
     platform.ready().then(() => {

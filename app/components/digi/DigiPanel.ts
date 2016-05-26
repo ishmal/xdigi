@@ -31,7 +31,7 @@ import {Tuner,TunerImpl} from "../../lib/tuner";
         </ion-col>
       </ion-row>
 
-      <canvas #tuner class='digi-tuner item' width='800' height='124'></canvas>
+      <canvas #tuner class='digi-tuner item' width='800' height='150'></canvas>
 
       <ion-row id='vcrbar'>
         <ion-col width-25>

@@ -1,4 +1,22 @@
 
+<ion-navbar *navbar>
+  <button menuToggle>
+    <ion-icon name="menu"></ion-icon>
+  </button>
+  <ion-title>xdigi</ion-title>
+</ion-navbar>
+
+<ion-menu [content]="content">
+  <button menuToggle>
+    Modes <ion-icon name="menu"></ion-icon>
+  </button>
+
+  <digi-modes></digi-modes>
+
+</ion-menu>
+
+<ion-nav id="nav" [root]="rootPage" #content swipeBackEnabled="false"></ion-nav>
+
 <ion-content class="page1">
   <div class="row">
     <digi-panel></digi-panel>
