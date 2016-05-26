@@ -19,7 +19,13 @@ import {Tuner,TunerImpl} from "../../lib/tuner";
         </ion-col>
         <ion-col width-15>
           <ion-item>
-            <ion-label>QRZ lookup</ion-label>
+            <ion-label>AFC</ion-label>
+            <ion-toggle [(ngModel)]='useAfc'></ion-toggle>
+          </ion-item>
+        </ion-col>
+        <ion-col width-15>
+          <ion-item>
+            <ion-label>QRZ</ion-label>
             <ion-toggle [(ngModel)]='useQRZ'></ion-toggle>
           </ion-item>
         </ion-col>
@@ -148,6 +154,15 @@ export class DigiPanel implements AfterViewInit {
   @Input()
   set rxTx(val) {
     this.digi.txMode = val;
+  }
+
+  get useAfc() {
+    return this.digi.useAfc;
+  }
+
+  @Input()
+  set useAfc(val) {
+    this.digi.useAfc = val;
   }
 
   get useQRZ() {

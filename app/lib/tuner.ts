@@ -199,6 +199,17 @@ export class TunerImpl implements Tuner {
                 mouseFreq(event);
             }
         };
+        canvas.ontouchstart = (event) => {
+            self._dragging = true;
+        };
+        canvas.ontouchend = (event) => {
+            self._dragging = false;
+        };
+        canvas.ontouchmove = (event) => {
+            if (self._dragging) {
+                mouseFreq(event);
+            }
+        };
         // fine tuning, + or - one hertz
         canvas.onkeydown = (evt) => {
             let key = evt.which;
