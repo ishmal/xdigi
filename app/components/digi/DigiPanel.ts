@@ -41,10 +41,10 @@ import {Tuner,TunerImpl} from "../../lib/tuner";
           <button (click)="slowDown()"><ion-icon name="skip-backward"></ion-icon></button>
         </ion-col>
         <ion-col width-25>
-          <button (click)="fastUp()"><ion-icon name="skip-forward"></ion-icon></button>
+          <button (click)="slowUp()"><ion-icon name="skip-forward"></ion-icon></button>
         </ion-col>
         <ion-col width-25>
-          <button (click)="slowUp()"><ion-icon name="fastforward"></ion-icon></button>
+          <button (click)="fastUp()"><ion-icon name="fastforward"></ion-icon></button>
         </ion-col>
 
       </ion-row>
