@@ -179,9 +179,12 @@ export class TunerImpl implements Tuner {
         }
 
         function getMousePos(cnv, evt) {
+            let touches = evt.touches;
+            let cx = (touches) ? touches[0].clientX : evt.clientX;
+            let cy = (touches) ? touches[0].clientY : evt.clientY;
             let rect = cnv.getBoundingClientRect();
-            let x = (evt.clientX - rect.left) * cnv.width / rect.width;
-            let y = (evt.clientY - rect.top) * cnv.height / rect.height;
+            let x = (cx - rect.left) * cnv.width / rect.width;
+            let y = (cy - rect.top) * cnv.height / rect.height;
             return { x: x, y: y };
         }
 
