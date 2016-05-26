@@ -172,10 +172,19 @@ export class TunerImpl implements Tuner {
         // hate to use 'self' here, but it's a safe way
         let self = this;
 
+        let FINE_INCR = 2;
+
         function mouseFreq(event) {
             let pt = getMousePos(canvas, event);
-            let freq = self._MAX_FREQ * pt.x / self._width;
-            self.frequency = freq;
+            let x = pt.x;
+            if (x < 20 && self.frequency > FINE_INCR) {
+              self.frequency -= FINE_INCR;
+            } else if (x > canvas.width - 20 && self.frequency < self._MAX_FREQ - FINE_INCR) {
+              self.frequency += FINE_INCR;
+            } else {
+              let freq = self._MAX_FREQ * pt.x / self._width;
+              self.frequency = freq;
+            }
         }
 
         function getMousePos(cnv, evt) {

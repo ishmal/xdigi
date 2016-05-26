@@ -40,12 +40,14 @@ export interface OutText {
 }
 
 /**
- * Interface for a test input widget, which the UI should overload
+ * Interface for a text input/output widget, which the UI should overload
  */
-export interface InText {
+export interface Terminal {
     clear(): void;
 
     getText(): string;
+
+    putText(str: string): void;
 }
 
 
@@ -66,8 +68,7 @@ export class Digi {
     _modes: Mode[];
 
     _tuner: Tuner;
-    _outtext: OutText;
-    _intext: InText;
+    _terminal: Terminal;
     _stattext: OutText;
     _receive: (data: number) => void;
 
@@ -88,8 +89,11 @@ export class Digi {
         this._modes = [this.pskMode, this.rttyMode, this.packetMode, this.navtexMode];
 
         this._tuner = (canvas) ? new TunerImpl(this, canvas) : new TunerDummy();
-        this._outtext = { clear: () => { }, putText: (string) => { } };
-        this._intext = { clear: () => { }, getText: () => { return ''; } };
+        this._terminal = {
+          clear: () => { },
+          putText: (string) => { },
+          getText: () => { return ''; }
+        };
         this._stattext = { clear: () => { }, putText: (string) => { } };
 
         this.setupReceive();
@@ -230,32 +234,12 @@ export class Digi {
      * Make this an interface, so we can add things later.
      * Let the GUI override this.
      */
-    get outText(): OutText {
-        return this._outtext;
+    get terminal(): Terminal {
+        return this._terminal;
     }
 
-    set outText(val: OutText) {
-        this._outtext = val;
-    }
-
-    /**
-     * Output text to the gui
-     */
-    putText(str: string) {
-        this._outtext.putText(str);
-        this._watcher.update(str);
-    }
-
-    /**
-     * Make this an interface, so we can add things later.
-     * Let the GUI override this.
-     */
-    get inText(): InText {
-        return this._intext;
-    }
-
-    set inText(val: InText) {
-        this._intext = val;
+    set terminal(val: Terminal) {
+        this._terminal = val;
     }
 
     get statText(): OutText {
@@ -267,15 +251,22 @@ export class Digi {
     }
 
     /**
+     * Output text to the gui
+     */
+    putText(str: string) {
+        this._terminal.putText(str);
+        this._watcher.update(str);
+    }
+
+    /**
      * Input text from the gui
      */
     getText(): string {
-        return this._intext.getText();
+        return this._terminal.getText();
     }
 
     clear() {
-        this._outtext.clear();
-        this._intext.clear();
+        this._terminal.clear();
     }
 
 

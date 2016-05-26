@@ -2,7 +2,7 @@ import {Component, ViewChild, Input, AfterViewInit} from '@angular/core';
 import {CORE_DIRECTIVES} from '@angular/common';
 import {IONIC_DIRECTIVES} from 'ionic-angular';
 import {DigiService} from '../../services/DigiService';
-import {Digi,InText} from "../../lib/digi";
+import {Digi,Terminal} from "../../lib/digi";
 import {Tuner,TunerImpl} from "../../lib/tuner";
 
 @Component({
@@ -31,15 +31,14 @@ import {Tuner,TunerImpl} from "../../lib/tuner";
         </ion-col>
       </ion-row>
 
-      <canvas #tuner class='digi-tuner item' width='800' height='180'></canvas>
+      <canvas #tuner class='digi-tuner item' width='800' height='124'></canvas>
       <textarea #status class='digi-status item'></textarea>
-      <textarea #output class='digi-output item'></textarea>
-      <textarea #input class='digi-input item'></textarea>
+      <textarea #terminal class='digi-terminal item'></textarea>
     </div>
     `,
     styles: [`
       .digi-tuner {
-        height: 180px,
+        height: 124px,
         margin: 0;
         padding: 0;
       }
@@ -49,17 +48,11 @@ import {Tuner,TunerImpl} from "../../lib/tuner";
         resize: none;
         background-color : #d1d1d1;
       }
-      .digi-output {
-        height: 120px;
+      .digi-terminal {
+        height: 160px;
         overflow-y: scroll;
         resize: none;
         background-color : #88aa88;
-      }
-      .digi-input {
-        height: 100px;
-        overflow-y: scroll;
-        resize: none;
-        background-color : #aa8888;
       }
       .digi-rxtx {
         background-color : #88bb88;
@@ -79,8 +72,7 @@ export class DigiPanel implements AfterViewInit {
 
   @ViewChild("tuner") tunerAnchor;
   @ViewChild("status") statusAnchor;
-  @ViewChild("output") outputAnchor;
-  @ViewChild("input") inputAnchor;
+  @ViewChild("terminal") terminalAnchor;
 
   digi: Digi;
 
@@ -93,8 +85,7 @@ export class DigiPanel implements AfterViewInit {
     console.log("init");
     this.setupTuner();
     this.setupStatus();
-    this.setupInput();
-    this.setupOutput();
+    this.setupTerminal();
     this.digi.start();
   }
 
@@ -119,8 +110,8 @@ export class DigiPanel implements AfterViewInit {
     this.digi.statText = textWidget;
   }
 
-  setupOutput() {
-    let txt = this.outputAnchor.nativeElement;
+  setupTerminal() {
+    let txt = this.terminalAnchor.nativeElement;
     let textWidget = {
         clear : () => {
           txt.value = "";
@@ -129,22 +120,12 @@ export class DigiPanel implements AfterViewInit {
           let s = txt.value
           txt.value = s + str;
           txt.scrollTop = txt.scrollHeight;
-        }
-    };
-    this.digi.outText = textWidget;
-  }
-
-  setupInput() {
-    let txt = this.inputAnchor.nativeElement;
-    let textWidget = {
-        clear : () => {
-          txt.value = "";
         },
         getText : ():string => {
           return txt.value
         }
     };
-    this.digi.inText = textWidget;
+    this.digi.terminal = textWidget;
   }
 
   get rxTx() {
