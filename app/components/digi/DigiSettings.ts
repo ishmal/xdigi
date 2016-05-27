@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component,Input} from '@angular/core';
 import {IONIC_DIRECTIVES} from 'ionic-angular';
 import {DigiService} from '../../services/DigiService';
 import {Digi} from "../../lib/digi";
@@ -6,8 +6,23 @@ import {Digi} from "../../lib/digi";
 @Component({
   selector: 'digi-settings',
   template:`
-    <ion-grid class='digi-settings'>
-    </ion-grid>
+    <ion-list class='digi-settings'>
+
+      <ion-item>
+        <ion-label>AFC</ion-label>
+        <ion-toggle [(ngModel)]='useAfc'></ion-toggle>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>QRZ</ion-label>
+        <ion-toggle [(ngModel)]='useQRZ'></ion-toggle>
+      </ion-item>
+
+      <ion-item>
+        <button (click)='doExit()'>Exit</button>
+      </ion-item>
+
+    </ion-list>
     `,
     styles: [`
       .digi-settings {
@@ -23,5 +38,25 @@ export class DigiSettings {
     console.log("digisettings");
     this.digi = digiService.getDigi();
   }
+
+  get useAfc() {
+    return this.digi.useAfc;
+  }
+
+  @Input()
+  set useAfc(val) {
+    this.digi.useAfc = val;
+  }
+
+  get useQRZ() {
+    return this.digi.useQrz;
+  }
+
+  @Input()
+  set useQRZ(val) {
+    this.digi.useQrz = val;
+  }
+
+
 
 }

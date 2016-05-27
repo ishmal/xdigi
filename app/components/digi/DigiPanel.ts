@@ -9,28 +9,7 @@ import {Tuner,TunerImpl} from "../../lib/tuner";
   selector: 'digi-panel',
   template:`
     <div class='list'>
-
-      <ion-row id="buttonbar">
-        <ion-col width-15>
-          <ion-item [ngClass]='{txActive: rxTx, txInactive: !rxTx}'>
-            <ion-label>Rx / Tx</ion-label>
-            <ion-toggle  [(ngModel)]='rxTx' disabled='false'></ion-toggle>
-          </ion-item>
-        </ion-col>
-        <ion-col width-15>
-          <ion-item>
-            <ion-label>AFC</ion-label>
-            <ion-toggle [(ngModel)]='useAfc'></ion-toggle>
-          </ion-item>
-        </ion-col>
-        <ion-col width-15>
-          <ion-item>
-            <ion-label>QRZ</ion-label>
-            <ion-toggle [(ngModel)]='useQRZ'></ion-toggle>
-          </ion-item>
-        </ion-col>
-      </ion-row>
-
+    
       <canvas #tuner class='digi-tuner item' width='800' height='180'></canvas>
 
       <ion-row id='vcrbar'>
@@ -155,24 +134,6 @@ export class DigiPanel implements AfterViewInit {
   @Input()
   set rxTx(val) {
     this.digi.txMode = val;
-  }
-
-  get useAfc() {
-    return this.digi.useAfc;
-  }
-
-  @Input()
-  set useAfc(val) {
-    this.digi.useAfc = val;
-  }
-
-  get useQRZ() {
-    return this.digi.useQrz;
-  }
-
-  @Input()
-  set useQRZ(val) {
-    this.digi.useQrz = val;
   }
 
   fastDown() {
