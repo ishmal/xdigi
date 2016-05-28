@@ -5,11 +5,8 @@
     <ion-icon name="menu"></ion-icon>
   </button>
 
-  <ion-title>xdigi</ion-title>
-
-  <ion-buttons [ngClass]='{txActive: rxTx, txInactive: !rxTx}' center>
-    <button [(ngModel)]='rxTx' disabled='false'>Rx / Tx</button>
-  </ion-buttons>
+  <ion-title [ngClass]='{txActive: rxTx, txInactive: !rxTx}'
+    (click)='toggleRxTx()'>xdigi {{ (rxTx) ? 'tx' : 'rx' }}</ion-title>
 
   <ion-buttons end>
   <button menuToggle='right' position='right'>

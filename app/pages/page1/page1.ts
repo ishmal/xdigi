@@ -1,5 +1,5 @@
 import {Input} from '@angular/core';
-import {Page} from 'ionic-angular';
+import {Page, IONIC_DIRECTIVES} from 'ionic-angular';
 import {Digi} from "../../lib/digi";
 import {DigiService} from '../../services/DigiService';
 import {DigiPanel} from "../../components/digi/DigiPanel";
@@ -8,7 +8,7 @@ import {DigiSettings} from "../../components/digi/DigiSettings";
 
 @Page({
 	templateUrl: 'build/pages/page1/page1.html',
-	directives: [DigiPanel, DigiModes, DigiSettings]
+	directives: [DigiPanel, DigiModes, DigiSettings, IONIC_DIRECTIVES]
 })
 export class Page1 {
 
@@ -23,10 +23,8 @@ export class Page1 {
     return this.digi.txMode;
   }
 
-  @Input()
-  set rxTx(val) {
-    this.digi.txMode = val;
-  }
-
+	toggleRxTx() {
+		this.digi.txMode = !this.digi.txMode;
+	}
 
 }
