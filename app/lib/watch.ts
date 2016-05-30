@@ -59,14 +59,14 @@ class Watcher {
 
     showQrz(call) {
         if (this.useQrz) {
-            window.open('http:// qrz.com/db/' + call,
+            window.open('http://qrz.com/db/' + call,
                 'qrzquery', 'menubar=true,toolbar=true');
         }
     }
 
     announce(call) {
         let msg = call.ts.toUTCString() + ' : ' + call.call + ' : ' +
-            call.freq + ' : ' + call.mode + '/' + call.rate;
+            call.freq.toFixed(1) + ' : ' + call.mode + '/' + call.rate.toFixed(2);
         this.par.status(msg);
         this.showQrz(call.call);
     }
