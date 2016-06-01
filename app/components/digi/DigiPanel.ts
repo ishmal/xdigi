@@ -8,8 +8,8 @@ import {Tuner,TunerImpl} from "../../lib/tuner";
 @Component({
   selector: 'digi-panel',
   template:`
-    <div class='list'>
-    
+    <div class='digi-panel'>
+
       <canvas #tuner class='digi-tuner item' width='800' height='180'></canvas>
 
       <ion-row id='vcrbar'>
@@ -32,6 +32,9 @@ import {Tuner,TunerImpl} from "../../lib/tuner";
     </div>
     `,
     styles: [`
+      .digi-panel {
+        height: 100%;
+      }
       .digi-tuner {
         height: 180px,
         margin: 0;
@@ -44,7 +47,7 @@ import {Tuner,TunerImpl} from "../../lib/tuner";
         background-color : #d1d1d1;
       }
       .digi-terminal {
-        height: 160px;
+        height: 100%;
         overflow-y: scroll;
         resize: none;
         background-color : #88aa88;

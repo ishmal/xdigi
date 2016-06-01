@@ -320,7 +320,7 @@ export class NavtexMode extends FskBase {
                 } else {
                     if (ccirValid(this._q3)) {
                         let c = this.processCode2(this._q3);
-                        this.par.status('FEC replaced :' + c);
+                        //this.par.status('FEC replaced :' + c);
                         res = ResultSoft;
                     } else {
                         this.processCode2(-1);

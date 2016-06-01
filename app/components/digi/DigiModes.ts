@@ -10,9 +10,9 @@ import {Mode,Properties} from "../../lib/mode/mode";
       <ion-list>
 
         <ion-item>
-        <ion-select [(ngModel)]="mode">
-          <ion-option *ngFor='let mode of modes' [value]='mode'>{{ mode.properties.name }}</ion-option>
-        </ion-select>
+        <select [(ngModel)]="mode" class='digi-mode-select' end>
+          <option *ngFor='let mode of modes' [ngValue]='mode'>{{ mode.properties.name }}</option>
+        </select>
         </ion-item>
 
         <ion-item>
@@ -26,10 +26,10 @@ import {Mode,Properties} from "../../lib/mode/mode";
             <ion-toggle [(ngModel)]='ctrl.value' class='form-control'></ion-toggle>
           </ion-item>
           <ion-item *ngSwitchWhen="'choice'">
-            <ion-label>{{ctrl.name}}</ion-label>
-            <ion-select [(ngModel)]='ctrl.value' class='form-control'>
-              <ion-option *ngFor='let opt of ctrl.options' [value]='opt.value' >{{opt.name}}</ion-option>
-            </ion-select>
+            <label>{{ctrl.name}}</label>
+            <select [(ngModel)]='ctrl.value' class='digi-select' end>
+              <option *ngFor='let opt of ctrl.options' [ngValue]='opt.value' >{{opt.name}}</option>
+            </select>
           </ion-item>
           </div>
         </div>
@@ -37,7 +37,11 @@ import {Mode,Properties} from "../../lib/mode/mode";
         </ion-list>
     `,
     styles: [`
-      .digi-settings {
+      .digi-mode-select {
+        float: left;
+      }
+      .digi-select {
+        float: right;
       }
     `],
     directives: [IONIC_DIRECTIVES]

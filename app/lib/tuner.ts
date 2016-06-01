@@ -398,7 +398,7 @@ export class TunerImpl implements Tuner {
             }
         }
 
-        ctx.fillStyle = 'gray';
+        ctx.fillStyle = 'cyan';
         for (let hz = 0; hz < MAX_FREQ; hz += 500) {
             x = hz * pixPerHz - 10;
             ctx.fillText(hz.toString(), x, top + 14);
