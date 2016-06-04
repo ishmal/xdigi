@@ -12,18 +12,18 @@ import {Tuner,TunerImpl} from "../../lib/tuner";
 
       <canvas #tuner class='digi-tuner item' width='800' height='180'></canvas>
 
-      <ion-row id='vcrbar'>
+      <ion-row class='digi-vcr'>
         <ion-col width-25>
-          <button (click)="fastDown()"><ion-icon name="rewind"></ion-icon></button>
+          <button small dark (click)="fastDown()"><ion-icon name="rewind"></ion-icon></button>
+        </ion-col>
+        <ion-col >
+          <button small dark (click)="slowDown()"><ion-icon name="skip-backward"></ion-icon></button>
         </ion-col>
         <ion-col width-25>
-          <button (click)="slowDown()"><ion-icon name="skip-backward"></ion-icon></button>
+          <button small dark (click)="slowUp()"><ion-icon name="skip-forward"></ion-icon></button>
         </ion-col>
         <ion-col width-25>
-          <button (click)="slowUp()"><ion-icon name="skip-forward"></ion-icon></button>
-        </ion-col>
-        <ion-col width-25>
-          <button (click)="fastUp()"><ion-icon name="fastforward"></ion-icon></button>
+          <button small dark (click)="fastUp()"><ion-icon name="fastforward"></ion-icon></button>
         </ion-col>
 
       </ion-row>
@@ -39,6 +39,9 @@ import {Tuner,TunerImpl} from "../../lib/tuner";
         height: 180px,
         margin: 0;
         padding: 0;
+      }
+      .digi-vcr {
+        background-color : #333333;
       }
       .digi-status {
         height: 70px;
