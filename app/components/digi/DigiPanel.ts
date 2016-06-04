@@ -47,9 +47,6 @@ import {Tuner,TunerImpl} from "../../lib/tuner";
         background-color : #d1d1d1;
       }
       .digi-terminal {
-        height: 100%;
-        overflow-y: scroll;
-        resize: none;
         background-color : #88aa88;
       }
       .digi-rxtx {
@@ -79,6 +76,9 @@ export class DigiPanel implements AfterViewInit {
     console.log("digipanel");
     this.digi = digiService.getDigi();
     this.nav = nav;
+    window.addEventListener('resize', (evt) => {
+      this.resizeTerminal();
+    });
   }
 
   ngAfterViewInit() {
@@ -87,6 +87,7 @@ export class DigiPanel implements AfterViewInit {
     this.setupStatus();
     this.setupTerminal();
     this.digi.start();
+    this.resizeTerminal();
   }
 
   setupTuner() {
@@ -110,6 +111,16 @@ export class DigiPanel implements AfterViewInit {
         }
     };
     this.digi.statText = textWidget;
+  }
+
+  resizeTerminal() {
+    let elem = this.terminalAnchor.nativeElement;
+    let rect = elem.getBoundingClientRect();
+    let top = rect.top;
+    let windowHeight = window.innerHeight;
+    let newh = windowHeight - top - 10;
+    elem.height = newh;
+    elem.style.height = newh.toString() + "px";
   }
 
   setupTerminal() {
