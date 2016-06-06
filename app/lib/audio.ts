@@ -27,8 +27,8 @@ import {Resampler} from './resample';
 export class AudioInput {
 
     par: Digi;
-    sampleRate: number;
-    enabled: boolean;
+    public sampleRate: number;
+    public enabled: boolean;
 
     constructor(par: Digi) {
         this.par = par;
@@ -53,8 +53,8 @@ export class AudioInput {
 export class AudioOutput {
 
     par: Digi;
-    sampleRate: number;
-    enabled: boolean;
+    public sampleRate: number;
+    public enabled: boolean;
 
     constructor(par: Digi) {
         this.par = par;

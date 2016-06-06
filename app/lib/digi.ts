@@ -94,7 +94,7 @@ export class Digi {
           getText: () => { return ''; }
         };
         this._stattext = { clear: () => { }, putText: (string) => { } };
-        this._fft = FFTSR(Constants.FFT_SIZE, 700);
+        this._fft = FFTSR(Constants.FFT_SIZE, 750);
     }
 
 
@@ -191,11 +191,11 @@ export class Digi {
     set txMode(v: boolean) {
         this._txmode = v;
         if (v) {
-            this._audioInput.enabled = false;
-            this._audioOutput.enabled = true;
+            this._audioInput.stop();
+            this._audioOutput.start();
         } else {
-            this._audioInput.enabled = true;
-            this._audioOutput.enabled = false;
+            this._audioOutput.stop();
+            this._audioInput.start();
         }
     }
 
@@ -261,7 +261,6 @@ export class Digi {
 
     start(): void {
         this._audioInput.start();
-        this._audioOutput.start();
     }
 
     stop(): void {

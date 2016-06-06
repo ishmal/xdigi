@@ -49,6 +49,8 @@ interface AudioContext {
     createMediaStreamSource: (MediaStream) => MediaStreamAudioSourceNode;
     createMediaStreamDestination: () => any;
     createScriptProcessor: any;
+    createBuffer: (channels:number, frames:number, sampleRate: number) => any;
+    createBufferSource: () => any;
     destination: any;
     resume: () => void;
     suspend: () => void;
@@ -353,14 +355,82 @@ export class WebAudioInput extends AudioInput {
     }
 
     stop() {
-        if (this.stream) {
-            this.stream.stop();
+        this.enabled = false;
+        if (this.inputNode) {
+          this.inputNode.disconnect();
         }
         return true;
     }
 
 }
 
+/**
+ * Getting this to work with interpolation isn't easy
+ */
+export class WebAudioOutputx extends AudioOutput {
+
+    actx: AudioContext;
+    isRunning: boolean;
+    decimation: number;
+    source: any;
+
+    constructor(par: Digi) {
+        super(par);
+        this.actx = new AudioContext();
+        this.decimation = 7;
+        this.sampleRate = this.actx.sampleRate / this.decimation;
+        this.isRunning = false;
+        this.enabled = false;
+    }
+
+
+    start() {
+
+        let that = this;
+        let olen = 2048;
+        let ibuf = [];
+        let ilen = 0;
+        let iptr = 0;
+        this.source = this.actx.createBufferSource();
+        let audioBuffer = this.actx.createBuffer(1, olen, this.sampleRate);
+        let obuf = audioBuffer.getChannelData(0);
+
+        function reload(e) {
+          if (!that.isRunning) {
+            return;
+          }
+          for (let i = 0 ; i < olen ; i++) {
+            obuf[i] = ibuf[iptr++];
+            if (iptr >= ilen) {
+              ibuf = that.par.transmit();
+              ilen = ibuf.length;
+              iptr = 0;
+            }
+          }
+          that.source = that.actx.createBufferSource();
+          that.source.buffer = audioBuffer;
+          that.source.connect(that.actx.destination);
+          that.source.onended = reload;
+          that.source.start();
+          that.isRunning = true;
+        }//reload
+
+        this.isRunning = true;
+        reload(null);
+        return true;
+    }
+
+
+    stop() {
+        this.isRunning = false;
+        if (this.source) {
+          this.source.stop();
+        }
+        return true;
+    }
+
+
+}
 
 /**
  * Getting this to work with interpolation isn't easy
@@ -369,6 +439,7 @@ export class WebAudioOutput extends AudioOutput {
 
     actx: AudioContext;
     isRunning: boolean;
+    outputNode: any;
 
     constructor(par: Digi) {
         super(par);
@@ -380,30 +451,38 @@ export class WebAudioOutput extends AudioOutput {
 
     start() {
 
-        /**/
+        let that = this;
         let bufferSize = 4096;
         let decimation = 7;
+        let iptr = 0;
         let ibuf = [];
-        let iptr = decimation;
+        let ilen = 0;
+        let obuf = new Array(decimation);
+        let optr = decimation;
         let resampler = Resampler.create(decimation);
-        let outputNode = this.actx.createScriptProcessor(bufferSize, 0, 1);
-        outputNode.onaudioprocess = function(e) {
-            if (!this.enabled) {
+        this.outputNode = this.actx.createScriptProcessor(bufferSize, 0, 1);
+        this.outputNode.onaudioprocess = (e) => {
+            if (!that.isRunning) {
                 return;
             }
             let output = e.outputBuffer.getChannelData(0);
             let len = output.length;
             for (let i = 0; i < len; i++) {
-                if (iptr >= decimation) {
-                    let v = this.par.transmit();
-                    resampler.interpolate(v, ibuf);
-                    iptr = 0;
+                if (optr >= decimation) {
+                    if (iptr >= ilen) {
+                      ibuf = this.par.transmit();
+                      ilen = ibuf.length;
+                      iptr = 0;
+                    }
+                    let v = ibuf[iptr++] * 0.1;
+                    resampler.interpolate(v, obuf);
+                    optr = 0;
                 }
-                output[i] = ibuf[iptr++];
+                output[i] = obuf[optr++];
             }
         };
 
-        outputNode.connect(this.actx.destination);
+        this.outputNode.connect(this.actx.destination);
         this.isRunning = true;
         return true;
     }
@@ -411,6 +490,9 @@ export class WebAudioOutput extends AudioOutput {
 
     stop() {
         this.isRunning = false;
+        if (this.outputNode) {
+          this.outputNode.disconnect();
+        }
         return true;
     }
 

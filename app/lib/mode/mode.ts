@@ -87,6 +87,7 @@ export class Mode {
         this._nco = NcoCreate(this._frequency, par.sampleRate);
         this._txNco = NcoCreateSimple(this._frequency, par.sampleRate);
         this._cwBuffer = new Array(1024)
+        this._cwBuffer.fill(1.0);
         this._properties = {
             name: 'mode',
             description: 'Base mode class.  Please override this method',
@@ -219,8 +220,8 @@ export class Mode {
         let out = new Array(len);
         for (let i = 0 ; i < len ; i++) {
           let v = baseBand[i];
-          let a = this._txNco.mixNext(i);
-          out[i] = abs(a.r, a.i);
+          let a = this._txNco.mixNext(v);
+          out[i] = a.r;
         }
         return out;
     }
