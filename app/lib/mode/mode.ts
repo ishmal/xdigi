@@ -216,14 +216,8 @@ export class Mode {
     getTransmitData(): number[] {
         let abs = Math.hypot;
         let baseBand = this.getBasebandData();
-        let len = baseBand.length;
-        let out = new Array(len);
-        for (let i = 0 ; i < len ; i++) {
-          let v = baseBand[i];
-          let a = this._txNco.mixNext(v);
-          out[i] = a.r;
-        }
-        return out;
+        let xs = this._txNco.mixBuf(baseBand);
+        return xs;
     }
 
     /**

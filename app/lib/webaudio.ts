@@ -25,6 +25,7 @@
 
 import {Digi} from './digi';
 import {Resampler} from './resample';
+import {RS7} from './rs7';
 import {AudioInput, AudioOutput} from './audio';
 
 //######################################################################
@@ -51,6 +52,7 @@ interface AudioContext {
     createScriptProcessor: any;
     createBuffer: (channels:number, frames:number, sampleRate: number) => any;
     createBufferSource: () => any;
+    createBiquadFilter: () => any;
     destination: any;
     resume: () => void;
     suspend: () => void;
@@ -439,7 +441,8 @@ export class WebAudioOutput extends AudioOutput {
 
     actx: AudioContext;
     isRunning: boolean;
-    outputNode: any;
+    source: any;
+    lpf: any;
 
     constructor(par: Digi) {
         super(par);
@@ -457,32 +460,37 @@ export class WebAudioOutput extends AudioOutput {
         let iptr = 0;
         let ibuf = [];
         let ilen = 0;
-        let obuf = new Array(decimation);
-        let optr = decimation;
-        let resampler = Resampler.create(decimation);
-        this.outputNode = this.actx.createScriptProcessor(bufferSize, 0, 1);
-        this.outputNode.onaudioprocess = (e) => {
+        let resampler = new RS7();
+        this.source = this.actx.createScriptProcessor(bufferSize, 0, 1);
+        this.source.onaudioprocess = (e) => {
             if (!that.isRunning) {
                 return;
             }
             let output = e.outputBuffer.getChannelData(0);
             let len = output.length;
             for (let i = 0; i < len; i++) {
-                if (optr >= decimation) {
-                    if (iptr >= ilen) {
-                      ibuf = this.par.transmit();
-                      ilen = ibuf.length;
+                if (iptr >= ilen) {
+                      let buf = this.par.transmit();
+                      ilen = buf.length * 7;
+                      ibuf = new Array(ilen);
+                      resampler.interpolate(buf, ibuf);
                       iptr = 0;
-                    }
-                    let v = ibuf[iptr++] * 0.1;
-                    resampler.interpolate(v, obuf);
-                    optr = 0;
                 }
-                output[i] = obuf[optr++];
+                let v = ibuf[iptr++];
+                output[i] = v;
             }
         };
 
-        this.outputNode.connect(this.actx.destination);
+        //this.outputNode.connect(this.actx.destination);
+
+        let lpf = this.actx.createBiquadFilter();
+        lpf.type = "lowpass";
+        lpf.frequency.value = 3500.0;
+        lpf.gain.value = 10;
+        lpf.Q.value = 10;
+        this.source.connect(lpf);
+        lpf.connect(this.actx.destination);
+
         this.isRunning = true;
         return true;
     }
@@ -490,8 +498,8 @@ export class WebAudioOutput extends AudioOutput {
 
     stop() {
         this.isRunning = false;
-        if (this.outputNode) {
-          this.outputNode.disconnect();
+        if (this.source) {
+          this.source.disconnect();
         }
         return true;
     }

@@ -25,10 +25,11 @@ function createCossinTable(): Complex[] {
     let two16 = 65536;
     let delta = twopi / two16;
     let xs = new Array(two16);
+    let angle = 0;
 
     for (let idx = 0; idx < two16; idx++) {
-        let angle = delta * idx;
         xs[idx] = { r: Math.cos(angle), i: Math.sin(angle) };
+        angle += delta;
     }
     return xs;
 }
@@ -40,6 +41,7 @@ export interface Nco {
     setError(v: number): void;
     next(): Complex;
     mixNext(v: number): Complex;
+    mixBuf(inb: number[]): number[];
 }
 
 /**
@@ -48,7 +50,8 @@ export interface Nco {
  */
 export function NcoCreate(frequency, sampleRate): Nco {
 
-    let hzToInt = 0x7fffffff / sampleRate;
+    const TWO32 = 4294967296.0;
+    let hzToInt = TWO32 / sampleRate;
     let freq = 0 | 0;
     let phase = 0 | 0;
     let table = ncoTable;
@@ -74,21 +77,34 @@ export function NcoCreate(frequency, sampleRate): Nco {
     }
 
     function next(): Complex {
-        phase = (phase + (freq + err)) & 0x7fffffff;
-        return table[(phase >> 16) & 0xffff];
+        phase += freq + err;
+        return table[phase >>> 16];
     }
 
     function mixNext(v: number): Complex {
-        phase = (phase + (freq + err)) & 0x7fffffff;
-        let cs = table[(phase >> 16) & 0xffff];
+        phase += freq + err;
+        let cs = table[phase >>> 16];
         return { r: v * cs.r, i: -v * cs.i };
+    }
+
+    function mixBuf(inb: number[]): number[] {
+        let len = inb.length;
+        let xs = new Array(len);
+        for (let i=0 ; i < len ; i++) {
+          let v = inb[i];
+          phase += freq + err;
+          let cs = table[phase >>> 16];
+          xs[i] = v * cs.r - v * cs.i;
+        }
+        return xs;
     }
 
     return {
         setFrequency: setFrequency,
         setError: setError,
         next: next,
-        mixNext: mixNext
+        mixNext: mixNext,
+        mixBuf: mixBuf
     };
 }
 
@@ -97,7 +113,8 @@ export function NcoCreate(frequency, sampleRate): Nco {
  */
 export function NcoCreateSimple(frequency, sampleRate): Nco {
 
-    let hzToInt = 0x7fffffff / sampleRate;
+    const TWO32 = 4294967296.0;
+    let hzToInt = TWO32 / sampleRate;
     let freq = 0 | 0;
     let phase = 0 | 0;
     let table = ncoTable;
@@ -111,20 +128,34 @@ export function NcoCreateSimple(frequency, sampleRate): Nco {
     }
 
     function next(): Complex {
-        phase = (phase + freq) & 0x7fffffff;
-        return table[(phase >> 16) & 0xffff];
+        phase += freq;
+        return table[phase >>> 16];
     }
 
     function mixNext(v: number): Complex {
-        phase = (phase + freq) & 0x7fffffff;
-        let cs = table[(phase >> 16) & 0xffff];
+        phase += freq;
+        let cs = table[phase >>> 16];
         return { r: v * cs.r, i: -v * cs.i };
     }
+
+    function mixBuf(inb: number[]): number[] {
+        let len = inb.length;
+        let xs = new Array(len);
+        for (let i=0 ; i < len ; i++) {
+          let v = inb[i];
+          phase += freq;
+          let cs = table[phase >>> 16];
+          xs[i] = v * cs.r - v * cs.i;
+        }
+        return xs;
+    }
+
 
     return {
         setFrequency: setFrequency,
         setError: setError,
         next: next,
-        mixNext: mixNext
+        mixNext: mixNext,
+        mixBuf: mixBuf
     };
 }
