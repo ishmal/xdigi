@@ -279,7 +279,7 @@ export class WebAudioInput extends AudioInput {
         super(par);
         this.par = par;
         this.actx = new AudioContext();
-        this.decimation = 7;
+        this.decimation = 8;
         this.sampleRate = this.actx.sampleRate / this.decimation;
         this.source = null;
         this.stream = null;
@@ -379,7 +379,7 @@ export class WebAudioOutput extends AudioOutput {
 
         /**/
         let bufferSize = 4096;
-        let decimation = 7;
+        let decimation = 8;
         let ibuf = [];
         let iptr = decimation;
         let resampler = Resampler.create(decimation);

@@ -689,6 +689,23 @@ function Resampler7(): Resampler {
     };
 }
 
+function Resampler8(): Resampler {
+  let rs2 = Resampler2();
+  let rs4 = Resampler4();
+
+  function dec(v: number): number {
+    let v1 = rs2.dec(v);
+    return (v1 != null) ? rs4.dec(v1) : v1;
+  }
+
+  return {
+      decimate: dec,
+      decimatex: decx,
+      interpolate: int,
+      interpolatex: intx
+  };
+}
+
 /**
  * ### decimation : 11
  */

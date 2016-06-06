@@ -86,7 +86,7 @@ export class Mode {
         this._rate = 31.25;
         this._nco = NcoCreate(this._frequency, par.sampleRate);
         this._txNco = NcoCreateSimple(this._frequency, par.sampleRate);
-        this._cwBuffer = new Array(par.sampleRate)
+        this._cwBuffer = new Array(1024)
         this._properties = {
             name: 'mode',
             description: 'Base mode class.  Please override this method',
