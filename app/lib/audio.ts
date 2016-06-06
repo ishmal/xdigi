@@ -35,7 +35,7 @@ export class AudioInput {
         this.sampleRate = 8000;
         this.enabled = true;
     }
-    receive(data: number) {
+    receive(data: number[]) {
         this.par.receive(data);
     }
 
@@ -62,7 +62,7 @@ export class AudioOutput {
         this.enabled = true;
     }
 
-    transmit(): number {
+    transmit(): number[] {
         return this.par.transmit();
     }
 

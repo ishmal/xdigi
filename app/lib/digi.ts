@@ -70,7 +70,8 @@ export class Digi {
     _tuner: Tuner;
     _terminal: Terminal;
     _stattext: OutText;
-    _receive: (data: number) => void;
+
+    _fft:  FFT;
 
 
     constructor(canvas?: HTMLCanvasElement) {
@@ -95,36 +96,16 @@ export class Digi {
           getText: () => { return ''; }
         };
         this._stattext = { clear: () => { }, putText: (string) => { } };
-
-        this.setupReceive();
-    }
-
-    setupReceive() {
-        const FFT_MASK = Constants.FFT_SIZE - 1;
-        const FFT_WINDOW = 700;
-        let fft = new FFTSR(Constants.FFT_SIZE);
-        let ibuf = new Float32Array(Constants.FFT_SIZE);
-        let iptr = 0;
-        let icnt = 0;
-        let psbuf = new Float32Array(Constants.BINS);
-
-        this._receive = function(data: number) {
-            this._mode.receiveData(data);
-            ibuf[iptr++] = data;
-            iptr &= FFT_MASK;
-            if (++icnt >= FFT_WINDOW) {
-                icnt = 0;
-                fft.powerSpectrum(ibuf, psbuf);
-                // console.log('ps: ' + ps[100]);
-                this.tuner.update(psbuf);
-                this.mode.receiveFft(psbuf);
-            }
-        };
+        this._fft = FFTSR(Constants.FFT_SIZE, 700);
     }
 
 
-    receive(data: number) {
-        this._receive(data);
+    receive(data: number[]) {
+      this._mode.receiveData(data);
+      this._fft.powerSpectrumStream(data, (psbuf) => {
+        this.tuner.update(psbuf);
+        this.mode.receiveFft(psbuf);
+      });
     }
 
     log(msg) {
@@ -275,7 +256,7 @@ export class Digi {
     }
 
 
-    transmit(): number {
+    transmit(): number[] {
         return this._mode.getTransmitData();
     }
 

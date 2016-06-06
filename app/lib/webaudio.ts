@@ -287,10 +287,6 @@ export class WebAudioInput extends AudioInput {
         this.enabled = false;
     }
 
-    receive(v: number) {
-        this.par.receive(v);
-    }
-
     startStream(newstream: MediaStream) {
 
         this.stream = newstream;
@@ -303,9 +299,11 @@ export class WebAudioInput extends AudioInput {
          */
         this.source = this.actx.createMediaStreamSource(newstream);
 
-        let bufferSize = 8192;
+        let outBufSize = 1024;
+        let outBuf = new Array(outBufSize);
+        let bufferSize = outBufSize * this.decimation;
         let decimator = Resampler.create(this.decimation);
-        this.inputNode = this.actx.createScriptProcessor(4096, 1, 1);
+        this.inputNode = this.actx.createScriptProcessor(bufferSize, 1, 1);
         this.enabled = true;
         this.inputNode.onaudioprocess = (e) => {
             if (!this.enabled) {
@@ -314,12 +312,14 @@ export class WebAudioInput extends AudioInput {
             let input = e.inputBuffer.getChannelData(0);
             let len = input.length;
             let d = decimator;
+            let outptr = 0;
             for (let i = 0; i < len; i++) {
                 let v = d.decimate(input[i]);
                 if (v !== null) {
-                    this.par.receive(v);
+                    outBuf[outptr++] = v;
                 }
             }
+            this.receive(outBuf);
         };
 
         this.source.connect(this.inputNode);
@@ -373,10 +373,6 @@ export class WebAudioOutput extends AudioOutput {
         this.sampleRate = this.actx.sampleRate;
         this.isRunning = false;
         this.enabled = false;
-    }
-
-    transmit(): number {
-        return this.par.transmit();
     }
 
     start() {

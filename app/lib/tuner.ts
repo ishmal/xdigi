@@ -40,7 +40,7 @@ export interface Tuner {
 
     showScope(data: number): void;
 
-    update(data: number): void;
+    update(data: number[]): void;
 
 }
 
@@ -53,7 +53,7 @@ export class TunerDummy implements Tuner {
 
     showScope(data: number): void { }
 
-    update(data: number): void { }
+    update(data: number[]): void { }
 }
 
 //add some things to the api
@@ -460,7 +460,7 @@ export class TunerImpl implements Tuner {
         ctx.restore();
     }
 
-    updateData(data) {
+    updateData(data: number[]) {
         this.drawWaterfall2(data);
         this.drawSpectrum(data);
         this.drawTuner();
@@ -471,7 +471,7 @@ export class TunerImpl implements Tuner {
         this._scopeData = data;
     }
 
-    update(data) {
+    update(data: number[]) {
         requestAnimationFrame(() => {
             this.updateData(data);
         });

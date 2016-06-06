@@ -33,9 +33,6 @@ export class NativeAudioInput extends AudioInput {
     constructor(par: Digi) {
         super(par);
     }
-    receive(data: number) {
-        this.par.receive(data);
-    }
 
     start(): boolean {
         return true;
@@ -53,10 +50,6 @@ export class NativeAudioOutput extends AudioOutput {
 
     constructor(par: Digi) {
         super(par);
-    }
-
-    transmit(): number {
-        return this.par.transmit();
     }
 
     start(): boolean {

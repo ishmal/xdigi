@@ -91,3 +91,40 @@ export function NcoCreate(frequency, sampleRate): Nco {
         mixNext: mixNext
     };
 }
+
+/**
+ * A simpler Nco for transmitting, etc
+ */
+export function NcoCreateSimple(frequency, sampleRate): Nco {
+
+    let hzToInt = 0x7fffffff / sampleRate;
+    let freq = 0 | 0;
+    let phase = 0 | 0;
+    let table = ncoTable;
+    setFrequency(frequency);
+
+    function setFrequency(v: number): void {
+        freq = (v * hzToInt) | 0;
+    }
+
+    function setError(v: number): void {
+    }
+
+    function next(): Complex {
+        phase = (phase + freq) & 0x7fffffff;
+        return table[(phase >> 16) & 0xffff];
+    }
+
+    function mixNext(v: number): Complex {
+        phase = (phase + freq) & 0x7fffffff;
+        let cs = table[(phase >> 16) & 0xffff];
+        return { r: v * cs.r, i: -v * cs.i };
+    }
+
+    return {
+        setFrequency: setFrequency,
+        setError: setError,
+        next: next,
+        mixNext: mixNext
+    };
+}

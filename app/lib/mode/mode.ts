@@ -20,7 +20,7 @@
 
 import {Digi} from '../digi';
 import {Complex} from '../complex';
-import {Nco, NcoCreate} from '../nco';
+import {Nco, NcoCreate, NcoCreateSimple} from '../nco';
 import {Constants} from '../constants';
 import {Filter, Biquad} from '../filter';
 
@@ -56,11 +56,14 @@ export class Mode {
     _useAfc: boolean;
     _rate: number;
     _nco: Nco;
+    _txNco: Nco;
     _obuf: Float32Array;
     _optr: number;
     _ibuf: number[];
     _ilen: number;
     _iptr: number;
+    _cwBuffer: number[];
+
     /**
      * We must set this property once at construction, and always
      * return the same object in the getter, in order to avoid
@@ -82,6 +85,8 @@ export class Mode {
         this._useAfc = false;
         this._rate = 31.25;
         this._nco = NcoCreate(this._frequency, par.sampleRate);
+        this._txNco = NcoCreateSimple(this._frequency, par.sampleRate);
+        this._cwBuffer = new Array(par.sampleRate)
         this._properties = {
             name: 'mode',
             description: 'Base mode class.  Please override this method',
@@ -100,6 +105,7 @@ export class Mode {
     set frequency(freq: number) {
         this._frequency = freq;
         this._nco.setFrequency(freq);
+        this._txNco.setFrequency(freq);
         this.adjustAfc();
     }
 
@@ -187,12 +193,14 @@ export class Mode {
         }
     }
 
-
-    receiveData(v: number): void {
-        let cs = this._nco.next();
-        this.receive({ r: v * cs.r, i: -v * cs.i });
+    receiveData(data: number[]): void {
+        let len = data.length;
+        for (let i=0 ; i < len ; i++) {
+          let v = data[i];
+          let cs = this._nco.next();
+          this.receive({ r: v * cs.r, i: -v * cs.i });
+        }
     }
-
 
     /**
      * Overload this for each mode.
@@ -200,37 +208,30 @@ export class Mode {
     receive(v: Complex): void {
     }
 
-
     // #######################
     // # T R A N S M I T
     // #######################
 
-
-    getTransmitData(): number {
-
-        /*
-        // output buffer empty?
-        if (this.optr >= this.decimation) {
-            // input buffer empty?
-            if (this.iptr >= this.ilen) {
-                this.ibuf = this.getBasebandData();
-                this.ilen = this.ibuf.length;
-                if (this.ilen === 0) {
-                    this.ilen = 1;
-                    this.ibuf = [0];
-                }
-                this.iptr = 0;
-            }
-            let v = this.ibuf[this.iptr++];
-            this.interpolator.interpolatex(v, this.interpbuf);
-            this.optr = 0;
+    getTransmitData(): number[] {
+        let abs = Math.hypot;
+        let baseBand = this.getBasebandData();
+        let len = baseBand.length;
+        let out = new Array(len);
+        for (let i = 0 ; i < len ; i++) {
+          let v = baseBand[i];
+          let a = this._txNco.mixNext(i);
+          out[i] = abs(a.r, a.i);
         }
-        let cx = this.obuf[this.optr];
-        let upmixed = this.nco.mixNext(cx);
-        return upmixed.abs();
-        */
+        return out;
+    }
 
-        return 0;
+    /**
+     * Override this for each mode
+     * Retrieve a buffer of baseband-modlated data
+     * (or idle tones) from each band
+     */
+    getBasebandData(): number[] {
+      return this._cwBuffer; //default to cw tone
     }
 
 }

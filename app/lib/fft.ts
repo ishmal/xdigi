@@ -21,6 +21,11 @@ import {Complex, ComplexOps} from './complex';
 import {Window} from './window';
 
 
+export interface FFT {
+  powerSpectrum(data: number[], ps: number[]);
+  powerSpectrumStream(data: number[], callback: (data: number[]) => any);
+}
+
 /**
  * Perform a relatively-efficient FFT
  */
@@ -143,10 +148,16 @@ function FFT(N) {
 /**
  * Perform a very efficient FFT.  Split Radix!
  */
-function FFTSR(N) {
+export function FFTSR(N: number, window: number) : FFT {
 
     let power = (Math.log(N) / Math.LN2) | 0;
     let N2 = N >> 1;
+    let fftWindow = window;
+    let fftMask = N - 1; //for streaming
+    let streamBuf = new Array(N);
+    let streamPtr = 0; //for streaming
+    let streamCounter = 0;
+    let psBuf = new Array(N);
 
     function generateBitReversedIndices(n) {
         let xs = new Array(n);
@@ -351,17 +362,35 @@ function FFTSR(N) {
         computePowerSpectrum(ps);
     }
 
-    this.powerSpectrum = powerSpectrum;
+    function powerSpectrumStream(data: number[], cb: (ps: number[]) => any) {
+      let dataLen = data.length;
+      for (let i=0 ; i < dataLen ; i++) {
+        let v = data[i];
+        streamBuf[streamPtr++] = v;
+        streamPtr &= fftMask;
+        if (++streamCounter >= fftWindow) {
+            streamCounter = 0;
+            powerSpectrum(streamBuf, psBuf);
+
+            cb(psBuf);
+            cb(psBuf);
+        }
+      }
+    }
 
     function powerSpectrumX(input, ps) {
         applyX(input);
         computePowerSpectrum(ps);
     }
 
-    this.powerSpectrumX = powerSpectrumX;
+    return {
+      powerSpectrum : powerSpectrum,
+      powerSpectrumStream: powerSpectrumStream
+    };
 
 
 } // FFTSR
+
 
 
 function SimpleGoertzel(frequency, binWidth, sampleRate) {
@@ -431,6 +460,3 @@ function SimpleGoertzel(frequency, binWidth, sampleRate) {
     };
 
 }
-
-
-export {FFT, FFTSR, SimpleGoertzel};
