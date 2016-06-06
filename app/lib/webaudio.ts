@@ -279,7 +279,7 @@ export class WebAudioInput extends AudioInput {
         super(par);
         this.par = par;
         this.actx = new AudioContext();
-        this.decimation = 8;
+        this.decimation = 7;
         this.sampleRate = this.actx.sampleRate / this.decimation;
         this.source = null;
         this.stream = null;
@@ -300,8 +300,9 @@ export class WebAudioInput extends AudioInput {
         this.source = this.actx.createMediaStreamSource(newstream);
 
         let outBufSize = 1024;
+        let outPtr = 0;
         let outBuf = new Array(outBufSize);
-        let bufferSize = outBufSize * this.decimation;
+        let bufferSize = 8192;
         let decimator = Resampler.create(this.decimation);
         this.inputNode = this.actx.createScriptProcessor(bufferSize, 1, 1);
         this.enabled = true;
@@ -312,14 +313,16 @@ export class WebAudioInput extends AudioInput {
             let input = e.inputBuffer.getChannelData(0);
             let len = input.length;
             let d = decimator;
-            let outptr = 0;
             for (let i = 0; i < len; i++) {
                 let v = d.decimate(input[i]);
                 if (v !== null) {
-                    outBuf[outptr++] = v;
+                    outBuf[outPtr++] = v;
+                    if (outPtr >= outBufSize) {
+                      this.receive(outBuf);
+                      outPtr = 0;
+                    }
                 }
             }
-            this.receive(outBuf);
         };
 
         this.source.connect(this.inputNode);
@@ -379,7 +382,7 @@ export class WebAudioOutput extends AudioOutput {
 
         /**/
         let bufferSize = 4096;
-        let decimation = 8;
+        let decimation = 7;
         let ibuf = [];
         let iptr = decimation;
         let resampler = Resampler.create(decimation);

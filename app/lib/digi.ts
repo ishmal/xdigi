@@ -66,11 +66,9 @@ export class Digi {
     navtexMode: Mode;
     _mode: Mode;
     _modes: Mode[];
-
     _tuner: Tuner;
     _terminal: Terminal;
     _stattext: OutText;
-
     _fft:  FFT;
 
 
