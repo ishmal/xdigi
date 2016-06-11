@@ -278,6 +278,7 @@ export class WebAudioInput extends AudioInput {
     source: MediaStreamAudioSourceNode;
     stream: MediaStream;
     inputNode: ScriptProcessorNode;
+		isRunning: boolean;
 
     constructor(par: Digi) {
         super(par);
@@ -288,7 +289,7 @@ export class WebAudioInput extends AudioInput {
         this.source = null;
         this.stream = null;
         this.inputNode = null;
-        this.enabled = false;
+        this.isRunning = false;
     }
 
     startStream(newstream: MediaStream) {
@@ -305,37 +306,37 @@ export class WebAudioInput extends AudioInput {
 
         let outBufSize = 1024;
         let outPtr = 0;
+				let outCtr = 0;
         let outBuf = new Array(outBufSize);
         let bufferSize = 8192;
-        let decimator = Resampler.create(this.decimation);
+        //let decimator = Resampler.create(this.decimation);
         this.inputNode = this.actx.createScriptProcessor(bufferSize, 1, 1);
-        this.enabled = true;
         this.inputNode.onaudioprocess = (e) => {
-            if (!this.enabled) {
+            if (!this.isRunning) {
                 return;
             }
             let input = e.inputBuffer.getChannelData(0);
             let len = input.length;
-            let d = decimator;
+            //let d = decimator;
             for (let i = 0; i < len; i++) {
-                let v = d.decimate(input[i]);
-                if (v !== null) {
-                    outBuf[outPtr++] = v;
-                    if (outPtr >= outBufSize) {
-                      this.receive(outBuf);
-                      outPtr = 0;
-                    }
-                }
+                outCtr++;
+								if (outCtr >= 7) {
+									outBuf[outPtr++] = input[i];
+									outCtr = 0;
+									if (outPtr >= outBufSize) {
+										this.receive(outBuf)
+										outPtr = 0;
+									}
+								}
             }
         };
 
         this.source.connect(this.inputNode);
         this.inputNode.connect(this.actx.destination);
-
-
+				this.isRunning = true;
     }
 
-    start() {
+    open(): boolean {
         if (navigator.getUserMedia) {
             navigator.getUserMedia(
                 { audio: true },
@@ -356,83 +357,27 @@ export class WebAudioInput extends AudioInput {
         return true;
     }
 
-    stop() {
-        this.enabled = false;
+    close(): boolean {
+        this.isRunning = false;
         if (this.inputNode) {
           this.inputNode.disconnect();
         }
         return true;
     }
 
-}
+		start(): boolean {
+			this.isRunning = true;
+			return true;
+		}
 
-/**
- * Getting this to work with interpolation isn't easy
- */
-export class WebAudioOutputx extends AudioOutput {
-
-    actx: AudioContext;
-    isRunning: boolean;
-    decimation: number;
-    source: any;
-
-    constructor(par: Digi) {
-        super(par);
-        this.actx = new AudioContext();
-        this.decimation = 7;
-        this.sampleRate = this.actx.sampleRate / this.decimation;
-        this.isRunning = false;
-        this.enabled = false;
-    }
-
-
-    start() {
-
-        let that = this;
-        let olen = 2048;
-        let ibuf = [];
-        let ilen = 0;
-        let iptr = 0;
-        this.source = this.actx.createBufferSource();
-        let audioBuffer = this.actx.createBuffer(1, olen, this.sampleRate);
-        let obuf = audioBuffer.getChannelData(0);
-
-        function reload(e) {
-          if (!that.isRunning) {
-            return;
-          }
-          for (let i = 0 ; i < olen ; i++) {
-            obuf[i] = ibuf[iptr++];
-            if (iptr >= ilen) {
-              ibuf = that.par.transmit();
-              ilen = ibuf.length;
-              iptr = 0;
-            }
-          }
-          that.source = that.actx.createBufferSource();
-          that.source.buffer = audioBuffer;
-          that.source.connect(that.actx.destination);
-          that.source.onended = reload;
-          that.source.start();
-          that.isRunning = true;
-        }//reload
-
-        this.isRunning = true;
-        reload(null);
-        return true;
-    }
-
-
-    stop() {
-        this.isRunning = false;
-        if (this.source) {
-          this.source.stop();
-        }
-        return true;
-    }
+		stop() {
+			this.isRunning = false;
+			return true;
+		}
 
 
 }
+
 
 /**
  * Getting this to work with interpolation isn't easy
@@ -452,7 +397,7 @@ export class WebAudioOutput extends AudioOutput {
         this.enabled = false;
     }
 
-    start() {
+    open(): boolean {
 
         let that = this;
         let bufferSize = 4096;
@@ -460,49 +405,68 @@ export class WebAudioOutput extends AudioOutput {
         let iptr = 0;
         let ibuf = [];
         let ilen = 0;
-        let resampler = new RS7();
+				let outPtr = 0;
         this.source = this.actx.createScriptProcessor(bufferSize, 0, 1);
         this.source.onaudioprocess = (e) => {
-            if (!that.isRunning) {
+					let outBuf = e.outputBuffer.getChannelData(0);
+					let len = outBuf.length;
+					outBuf.fill(0);
+          if (!that.isRunning) {
                 return;
             }
-            let output = e.outputBuffer.getChannelData(0);
-            let len = output.length;
-            for (let i = 0; i < len; i++) {
-                if (iptr >= ilen) {
-                      let buf = this.par.transmit();
-                      ilen = buf.length * 7;
-                      ibuf = new Array(ilen);
-                      resampler.interpolate(buf, ibuf);
-                      iptr = 0;
-                }
-                let v = ibuf[iptr++];
-                output[i] = v;
-            }
+						while (outPtr < len) {
+							if (iptr >= ilen) {
+								ibuf = this.par.transmit();
+								ilen = ibuf.length;
+								iptr = 0;
+							}
+							outBuf[outPtr] = ibuf[iptr++];
+							outPtr += decimation;
+						}
+						outPtr -= len;
         };
 
         //this.outputNode.connect(this.actx.destination);
 
-        let lpf = this.actx.createBiquadFilter();
+				let lpf = this.actx.createBiquadFilter();
         lpf.type = "lowpass";
-        lpf.frequency.value = 3500.0;
-        lpf.gain.value = 10;
-        lpf.Q.value = 10;
+        lpf.frequency.value = 3000.0;
+        lpf.gain.value = 5;
+        lpf.Q.value = 20;
         this.source.connect(lpf);
-        lpf.connect(this.actx.destination);
 
-        this.isRunning = true;
+
+				let lpf2 = this.actx.createBiquadFilter();
+        lpf2.type = "lowpass";
+        lpf2.frequency.value = 3000.0;
+        lpf2.gain.value = 5;
+        lpf2.Q.value = 20;
+        lpf.connect(lpf2);
+        lpf2.connect(this.actx.destination);
+
+        this.isRunning = false;  //by default
         return true;
     }
 
 
-    stop() {
+    close(): boolean {
         this.isRunning = false;
         if (this.source) {
           this.source.disconnect();
         }
         return true;
     }
+
+
+		start(): boolean {
+			this.isRunning = true;
+			return true;
+		}
+
+		stop(): boolean {
+			this.isRunning = false;
+			return true;
+		}
 
 
 }

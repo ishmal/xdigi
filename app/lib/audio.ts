@@ -24,7 +24,9 @@ import {Digi} from './digi';
 import {Resampler} from './resample';
 
 
-
+/**
+ * Base class for any audio input devices
+ */
 export class AudioInput {
 
     par: Digi;
@@ -40,10 +42,30 @@ export class AudioInput {
         this.par.receive(data);
     }
 
+		/**
+		 * Called to connect with the device and start processing.
+		 */
+		open(): boolean {
+			return true
+		}
+
+		/**
+		 * Called to disconnect from input device and cease operations
+		 */
+		close(): boolean {
+			return true;
+		}
+
+		/**
+		 * Called to resume input processing
+		 */
     start(): boolean {
         return true;
     }
 
+		/**
+		 * Called to pause input processing
+		 */
     stop(): boolean {
         return true;
     }
@@ -51,6 +73,10 @@ export class AudioInput {
 
 }
 
+
+/**
+ * Base clase for any audio output devices.
+ */
 export class AudioOutput {
 
     par: Digi;
@@ -67,12 +93,33 @@ export class AudioOutput {
         return this.par.transmit();
     }
 
+		/**
+		 * Called to connect with the device and start processing.
+		 */
+		open(): boolean {
+			return true
+		}
+
+		/**
+		 * Called to disconnect from input device and cease operations
+		 */
+		close(): boolean {
+			return true;
+		}
+
+		/**
+		 * Called to resume output processing
+		 */
     start(): boolean {
         return true;
     }
 
+		/**
+		 * Called to pause output processing
+		 */
     stop(): boolean {
         return true;
     }
+
 
 }

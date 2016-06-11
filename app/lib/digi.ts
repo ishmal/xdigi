@@ -80,7 +80,7 @@ export class Digi {
         /**
          * Add our modes here and set the default
          */
-        this.pskMode = new PskMode2(this);
+        this.pskMode = new PskMode(this);
         this.rttyMode = new RttyMode(this);
         this.packetMode = new PacketMode(this);
         this.navtexMode = new NavtexMode(this);
@@ -94,7 +94,7 @@ export class Digi {
           getText: () => { return ''; }
         };
         this._stattext = { clear: () => { }, putText: (string) => { } };
-        this._fft = FFTSR(Constants.FFT_SIZE, 750);
+        this._fft = FFTSR(Constants.FFT_SIZE, 300);
     }
 
 
@@ -260,12 +260,13 @@ export class Digi {
 
 
     start(): void {
-        this._audioInput.start();
+			this._audioInput.open();
+			this._audioOutput.open();
     }
 
     stop(): void {
-        this._audioInput.stop();
-        this._audioOutput.stop();
+        this._audioInput.close();
+        this._audioOutput.close();
     }
 
 

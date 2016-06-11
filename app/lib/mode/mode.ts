@@ -166,7 +166,7 @@ export class Mode {
     _setRate(v: number) {
         this._rate = v;
         this.adjustAfc();
-        this.status('Fs: ' + this.par.sampleRate + ' rate: ' + v +
+        console.log('Fs: ' + this.par.sampleRate + ' rate: ' + v +
             ' sps: ' + this.samplesPerSymbol);
     }
 
