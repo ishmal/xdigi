@@ -255,7 +255,7 @@ const LOG = Math.log;
 /**
  * Phase Shift Keying mode.
  */
-class PskMode extends Mode {
+export class PskMode extends Mode {
 
     _ilp: Filter;
     _qlp: Filter;
@@ -494,6 +494,3 @@ class PskMode extends Mode {
     }
 
 }//  PskMode2
-
-
-export {PskMode, PskMode2};

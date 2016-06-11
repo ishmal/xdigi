@@ -22,7 +22,7 @@ import {FFT, FFTSR} from './fft';
 import {AudioInput, AudioOutput} from './audio';
 import {AudioFactory} from './audiofactory';
 import {Mode} from './mode/mode';
-import {PskMode, PskMode2} from './mode/psk';
+import {PskMode} from './mode/psk';
 import {RttyMode} from './mode/rtty';
 import {PacketMode} from './mode/packet';
 import {NavtexMode} from './mode/navtex';
