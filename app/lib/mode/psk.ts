@@ -165,9 +165,7 @@ const descriptions = [
  */
 const encodeTable = descriptions.map(s => {
     let chars = s.split('');
-    let bools = chars.map(c => {
-        return (c === '1');
-    });
+    let bools = chars.map(c => (c === '1'));
     return bools;
 });
 
@@ -273,6 +271,8 @@ export class PskMode extends Mode {
     _lastBit: boolean;
     _txBuf: number[];
     _txPtr: number;
+    _txPhase: number[][];
+    _txQueue: number[][];
 
 
     constructor(par) {
@@ -352,6 +352,7 @@ export class PskMode extends Mode {
         // bpf = FIR.bandpass(13, -0.7*this.getRate(), 0.7*this.getRate(), this.getSampleRate());
         this._symbollen = this.samplesPerSymbol | 0;
         this._halfSym = this._symbollen >> 1;
+        this.setupTransmit();
     }
 
     receive(z) {
@@ -476,21 +477,55 @@ export class PskMode extends Mode {
     // # transmit
     // ###################
 
-
-    getNextTransmitBuffer(): number[] {
-        let ch = this.par.getText();
-        return [];
+    setupTransmit() {
+      let sps = this.samplesPerSymbol;
+      let txPhase = new Array[4];
+      for (let i = 0 ; i < 4 ; i++) {
+        txPhase[i] = new Array(sps);
+      }
+      for (let i = 0; i < sps ; i++) {
+        txPhase[0][i] = { r:  1.0, i:  0.0};
+        txPhase[1][i] = { r:  0.0, i:  1.0};
+        txPhase[2][i] = { r: -1.0, i:  0.0};
+        txPhase[3][i] = { r:  0.0, i: -1.0};
+      }
+      this._txPhase = txPhase;
     }
 
+    txStart(): Promise<boolean> {
+      return Promise.resolve(true);
+    }
 
-    transmit() {
+    txStop(): Promise<boolean> {
+      return Promise.resolve(true);
+    }
 
-        if (this._txPtr >= this._txBuf.length) {
-            this._txBuf = this.getNextTransmitBuffer();
-            this._txPtr = 0;
+    getTransmitText() {
+      let txt = "the quick brown fox jumped over the lazy dogs back";
+      let len = txt.length;
+      for (let i=0 ; i < len ; i++) {
+        let code = txt.charCodeAt(i);
+        let bits = encodeTable[i & 127];
+        let blen = bits.length;
+        for (let j = 0 ; j < blen ; j++) {
+          let b = bits[j];
+          let buf = (b) ? this._txPhase[0] : this._txPhase[1];
+          this._txQueue.push(buf);
         }
-        let txv = this._txBuf[this._txPtr++];
-        return txv;
+      }
     }
+
+
+    getTransmitData(): number[] {
+        let q = this._txQueue;
+        this.getTransmitText();
+        if (q.length) {
+          return q.shift();
+        } else {
+          return this._txPhase[0];
+        }
+    }
+
+
 
 }//  PskMode2

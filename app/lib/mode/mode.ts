@@ -213,6 +213,14 @@ export class Mode {
     // # T R A N S M I T
     // #######################
 
+    txStart(): Promise<boolean> {
+      return Promise.resolve(true);
+    }
+
+    txStop(): Promise<boolean> {
+      return Promise.resolve(true);
+    }
+
     getTransmitData(): number[] {
         let abs = Math.hypot;
         let baseBand = this.getBasebandData();
