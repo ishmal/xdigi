@@ -272,28 +272,24 @@ export class TunerImpl implements Tuner {
         let indices = this._indices;
 
         // ctx.fillStyle = 'red';
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.50)';
+				ctx.strokeStyle = 'white';
+				ctx.fillStyle = 'rgba(50, 50, 100, 0.5)';
         // ctx.lineWidth = 1;
         ctx.beginPath();
-        let base = height >> 1; // move this around
+        let base = height; // move this around
         ctx.moveTo(0, base);
         let log = Math.log;
         for (let x = 0; x < width; x++) {
-            let v = log(1.0 + data[indices[x]]) * 12.0;
+            let v = log(1.0 + data[indices[x]]) * 8.0;
             let y = base - v;
             // trace('x:' + x + ' y:' + y);
             ctx.lineTo(x, y);
         }
-        ctx.lineTo(width - 1, base);
-        for (let x = width - 1; x >= 0; x--) {
-            let v = log(1.0 + data[indices[x]]) * 12.0;
-            let y = base + v;
-            // trace('x:' + x + ' y:' + y);
-            ctx.lineTo(x, y);
-        }
-        ctx.lineTo(0, base);
+				ctx.lineTo(width, base);
+				ctx.lineTo(0, base);
         ctx.closePath();
         // let bbox = ctx.getBBox();
+				ctx.stroke();
         ctx.fill();
     }
 

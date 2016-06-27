@@ -67,7 +67,7 @@ export function NcoCreate(frequency, sampleRate): Nco {
 
 
     function setError(v: number): void {
-        err = (err * 0.9 + v * 100000.0) | 0;
+        err = (err * 0.9 + v * 1000.0) | 0;
         // console.log('err:' + err + '  v:' + v);
         if (err > maxErr) {
             err = maxErr;
