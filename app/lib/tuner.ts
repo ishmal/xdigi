@@ -473,7 +473,7 @@ export class TunerImpl implements Tuner {
 
     update(data: number[]) {
         requestAnimationFrame(() => {
-            this.updateData(data);
+            this.updateData(data.slice(0));
         });
     }
 

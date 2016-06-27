@@ -270,6 +270,7 @@ navigator.getUserMedia =
     navigator.webkitGetUserMedia ||
     navigator.mozGetUserMedia;
 
+const DECIMATION = 6;
 
 export class WebAudioInput extends AudioInput {
 
@@ -284,7 +285,7 @@ export class WebAudioInput extends AudioInput {
         super(par);
         this.par = par;
         this.actx = new AudioContext();
-        this.decimation = 7;
+        this.decimation = DECIMATION;
         this.sampleRate = this.actx.sampleRate / this.decimation;
         this.source = null;
         this.stream = null;
@@ -309,7 +310,7 @@ export class WebAudioInput extends AudioInput {
 				let outCtr = 0;
         let outBuf = new Array(outBufSize);
         let bufferSize = 8192;
-        //let decimator = Resampler.create(this.decimation);
+        let decimation = this.decimation;
         this.inputNode = this.actx.createScriptProcessor(bufferSize, 1, 1);
         this.inputNode.onaudioprocess = (e) => {
             if (!this.isRunning) {
@@ -320,7 +321,7 @@ export class WebAudioInput extends AudioInput {
             //let d = decimator;
             for (let i = 0; i < len; i++) {
                 outCtr++;
-								if (outCtr >= 7) {
+								if (outCtr >= decimation) {
 									outBuf[outPtr++] = input[i];
 									outCtr = 0;
 									if (outPtr >= outBufSize) {
@@ -388,11 +389,13 @@ export class WebAudioOutput extends AudioOutput {
     isRunning: boolean;
     source: any;
     lpf: any;
+		decimation: number;
 
     constructor(par: Digi) {
         super(par);
         this.actx = new AudioContext();
-        this.sampleRate = this.actx.sampleRate;
+				this.decimation = DECIMATION;
+        this.sampleRate = this.actx.sampleRate / this.decimation;
         this.isRunning = false;
         this.enabled = false;
     }
@@ -401,7 +404,7 @@ export class WebAudioOutput extends AudioOutput {
 
         let that = this;
         let bufferSize = 4096;
-        let decimation = 7;
+        let decimation = this.decimation;
         let iptr = 0;
         let ibuf = [];
         let ilen = 0;
@@ -432,7 +435,7 @@ export class WebAudioOutput extends AudioOutput {
         lpf.type = "lowpass";
         lpf.frequency.value = 3000.0;
         lpf.gain.value = 5;
-        lpf.Q.value = 20;
+        lpf.Q.value = 10;
         this.source.connect(lpf);
 
 
@@ -440,7 +443,7 @@ export class WebAudioOutput extends AudioOutput {
         lpf2.type = "lowpass";
         lpf2.frequency.value = 3000.0;
         lpf2.gain.value = 5;
-        lpf2.Q.value = 20;
+        lpf2.Q.value = 10;
         lpf.connect(lpf2);
         lpf2.connect(this.actx.destination);
 
