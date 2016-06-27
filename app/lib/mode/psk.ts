@@ -478,8 +478,8 @@ export class PskMode extends Mode {
     // ###################
 
     setupTransmit() {
-      let sps = this.samplesPerSymbol;
-      let txPhase = new Array[4];
+      let sps = this.samplesPerSymbol | 0;
+      let txPhase = new Array(4);
       for (let i = 0 ; i < 4 ; i++) {
         txPhase[i] = new Array(sps);
       }

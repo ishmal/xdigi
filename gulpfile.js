@@ -67,6 +67,11 @@ gulp.task('sass', buildSass);
 gulp.task('html', copyHTML);
 gulp.task('fonts', copyFonts);
 gulp.task('scripts', copyScripts);
+
 gulp.task('clean', function(){
-  return del('www/build');
+  return del([
+		'www/build',
+		'app/**/*.js',
+		'app/**/*.d.ts'
+	]);
 });

@@ -53,7 +53,7 @@ export class DigiModes {
 
   constructor(digiService: DigiService) {
     console.log("digisettings");
-    this.digi = digiService.getDigi();
+    this.digi = digiService.getDigiInstance();
     this.modes = this.digi.modes;
     this.mode = this.digi.mode;
   }

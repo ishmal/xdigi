@@ -15,7 +15,7 @@ export class Page1 {
 	digi: Digi;
 
   constructor(digiService: DigiService) {
-			this.digi = digiService.getDigi();
+			this.digi = digiService.getDigiInstance();
 	}
 
 

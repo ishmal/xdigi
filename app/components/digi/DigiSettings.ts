@@ -36,7 +36,7 @@ export class DigiSettings {
 
   constructor(digiService: DigiService) {
     console.log("digisettings");
-    this.digi = digiService.getDigi();
+    this.digi = digiService.getDigiInstance();
   }
 
   get useAfc() {

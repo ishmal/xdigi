@@ -1,6 +1,6 @@
 
 import {Injectable} from '@angular/core';
-import {Digi} from "../lib/digi"
+import {Digi} from "../lib/digi";
 
 @Injectable()
 export class DigiService {
@@ -15,7 +15,7 @@ export class DigiService {
    * Lazy getter, so that problems don't happen
    * during bootstrap
    */
-  getDigi() : Digi {
+  getDigiInstance() : Digi {
     if (!this._digi) {
       try {
         this._digi = new Digi();

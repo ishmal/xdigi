@@ -77,7 +77,7 @@ export class DigiPanel implements AfterViewInit {
 
   constructor(digiService: DigiService, nav: NavController) {
     console.log("digipanel");
-    this.digi = digiService.getDigi();
+    this.digi = digiService.getDigiInstance();
     this.nav = nav;
     window.addEventListener('resize', (evt) => {
       this.resizeTerminal();

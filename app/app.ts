@@ -1,13 +1,13 @@
-import {App, Platform} from 'ionic-angular';
+import {Component} from '@angular/core';
+import {Platform, ionicBootstrap} from 'ionic-angular';
 import {StatusBar} from 'ionic-native';
 import {Page1} from './pages/page1/page1';
 import {DigiService} from './services/DigiService';
 
 
-@App({
+@Component({
   template: '<ion-nav [root]="rootPage"></ion-nav>',
-  providers: [DigiService],
-  config: {} // http://ionicframework.com/docs/v2/api/config/Config/
+  providers: [DigiService]
 })
 export class MyApp {
 
@@ -21,3 +21,5 @@ export class MyApp {
     });
   }
 }
+
+ionicBootstrap(MyApp);
