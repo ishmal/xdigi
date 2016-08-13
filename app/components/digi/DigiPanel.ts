@@ -1,6 +1,7 @@
 import {Component, ViewChild, Input, AfterViewInit} from '@angular/core';
 import {CORE_DIRECTIVES} from '@angular/common';
-import {IONIC_DIRECTIVES, NavController, Toast} from 'ionic-angular';
+import {IONIC_DIRECTIVES, NavController} from 'ionic-angular';
+import {Toast} from 'ionic-native';
 import {DigiService} from '../../services/DigiService';
 import {Digi,Terminal} from "../../lib/digi";
 import {Tuner,TunerImpl} from "../../lib/tuner";
@@ -105,12 +106,7 @@ export class DigiPanel implements AfterViewInit {
           //no action
         },
         putText : (str: string) => {
-          let opts = {
-            message: str,
-            duration: 3000
-          };
-          let toast = new Toast(opts);
-          this.nav.present(toast);
+          Toast.show(str, '3000', 'center');
         }
     };
     this.digi.statText = textWidget;
