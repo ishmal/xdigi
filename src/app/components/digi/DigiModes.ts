@@ -43,8 +43,7 @@ import {Mode,Properties} from "../../lib/mode/mode";
       .digi-select {
         float: right;
       }
-    `],
-    directives: [IONIC_DIRECTIVES]
+    `]
 })
 export class DigiModes {
 

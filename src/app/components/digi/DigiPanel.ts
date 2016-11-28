@@ -1,9 +1,8 @@
 import {Component, ViewChild, Input, AfterViewInit} from '@angular/core';
-import {CORE_DIRECTIVES} from '@angular/common';
 import {IONIC_DIRECTIVES, NavController} from 'ionic-angular';
 import {Toast} from 'ionic-native';
 import {DigiService} from '../../services/DigiService';
-import {Digi,Terminal} from "../../lib/digi";
+import {Digi} from "../../lib/digi";
 import {Tuner,TunerImpl} from "../../lib/tuner";
 
 @Component({
@@ -63,8 +62,7 @@ import {Tuner,TunerImpl} from "../../lib/tuner";
       .txInactive{
         background-color : #00cc00;
       }
-    `],
-    directives: [CORE_DIRECTIVES, IONIC_DIRECTIVES]
+    `]
 })
 export class DigiPanel implements AfterViewInit {
 
@@ -164,8 +162,5 @@ export class DigiPanel implements AfterViewInit {
   fastUp() {
     this.digi.setFrequency(this.digi.frequency + 5);
   }
-
-
-
 
 }

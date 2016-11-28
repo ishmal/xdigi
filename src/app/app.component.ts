@@ -1,5 +1,5 @@
 import {Component} from '@angular/core';
-import {Platform, ionicBootstrap} from 'ionic-angular';
+import {Platform} from 'ionic-angular';
 import {StatusBar} from 'ionic-native';
 import {Page1} from './pages/page1/page1';
 import {DigiService} from './services/DigiService';
@@ -21,5 +21,3 @@ export class MyApp {
     });
   }
 }
-
-ionicBootstrap(MyApp);

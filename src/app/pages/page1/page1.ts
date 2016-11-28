@@ -1,12 +1,12 @@
-import {Input} from '@angular/core';
-import {Page, IONIC_DIRECTIVES} from 'ionic-angular';
+import {Input, Component} from '@angular/core';
+import {IONIC_DIRECTIVES} from 'ionic-angular';
 import {Digi} from "../../lib/digi";
 import {DigiService} from '../../services/DigiService';
 import {DigiPanel} from "../../components/digi/DigiPanel";
 import {DigiModes} from "../../components/digi/DigiModes";
 import {DigiSettings} from "../../components/digi/DigiSettings";
 
-@Page({
+@Component({
 	templateUrl: 'build/pages/page1/page1.html',
 	directives: [DigiPanel, DigiModes, DigiSettings, IONIC_DIRECTIVES]
 })
